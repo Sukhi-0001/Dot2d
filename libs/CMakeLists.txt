@@ -1,2 +1,2 @@
 add_subdirectory(./SDL)
-#include_directories(./SDL/include/)
+add_subdirectory(./glm)
