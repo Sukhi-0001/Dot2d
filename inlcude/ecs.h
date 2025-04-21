@@ -28,6 +28,26 @@ public:
   int get_id() const;
 };
 
+class Ipool {
+public:
+  virtual ~Ipool() {}
+};
+// POOL is just a wrapper around vector
+template <typename T> class Pool : Ipool {
+  std::vector<T> data;
+
+public:
+  Pool(int size = 100) { data.resize(100); }
+  bool is_empty() const { return data.empty(); }
+  int get_size() const { return data.size(); }
+  void resize(int size) { data.resize(size); }
+  void clear() { data.clear(); }
+  void add_object(T object) { data.push_back(object); }
+  void set(int index, T object) { data[index] = object; }
+  T &get(int index) { return static_cast<T &>(data[index]); }
+  T &operator[](unsigned int index) { return data[index]; }
+};
+
 class System {
   Signature components_signature;
   std::vector<Entity> entities;
@@ -42,6 +62,11 @@ public:
 };
 
 class Registry {
+  int num_entities = 0;
+  // each pool contains all data of a Component type
+  // vector index == component_id
+  // pool index == enitity id
+  std::vector<Ipool *> component_pools;
   // TODO
 };
 
