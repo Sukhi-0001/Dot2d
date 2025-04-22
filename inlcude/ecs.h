@@ -1,6 +1,9 @@
 #ifndef ECS_H
 #define ECS_H
 #include <bitset>
+#include <set>
+#include <typeindex>
+#include <unordered_map>
 #include <vector>
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
@@ -63,12 +66,62 @@ public:
 
 class Registry {
   int num_entities = 0;
+  // endtities to be added at end of frame or kill
+  std::set<Entity> entities_to_be_added;
+  std::set<Entity> entities_to_be_killed;
+
   // each pool contains all data of a Component type
   // vector index == component_id
   // pool index == enitity id
   std::vector<Ipool *> component_pools;
+  // vector of each components signature for Entity
+  // vector index == Entity.id
+  std::vector<Signature> entity_component_signature;
+  // map of active systems
+  std::pmr::unordered_map<std::type_index, System *> systems;
+
   // TODO
+public:
+  Registry();
+  Entity create_entity();
+  void add_entity_to_system();
+  void kill_entity(Entity entity);
+  void update();
+  template <typename T, typename... Targs>
+  void add_component(Entity entity, Targs &&...args);
+
+  template <typename T> void remove_component(Entity entity);
+  template <typename T> bool has_component(Entity entity) const;
+
+  template <typename T> T &get_component(Entity entity) const;
 };
+
+template <typename T, typename... Targs>
+void Registry::add_component(Entity entity, Targs &&...args) {
+  const int component_id = Component<T>::get_id();
+  const int entity_id = entity.get_id();
+
+  if (component_id >= component_pools.size()) {
+    component_pools.resize(component_id + 1, NULL);
+  }
+
+  if (!component_pools[component_id]) {
+    Pool<T> *new_component_pool = new Pool<T>();
+    component_pools[component_id] = new_component_pool;
+  }
+
+  Pool<T> *component_pool = Pool<T>(component_pools[component_id]);
+
+  if (entity_id >= component_pool->get_size()) {
+    component_pool->resize(num_entities);
+  }
+
+  T new_component(std::forward<Targs>(args)...);
+
+  component_pool->set(entity_id, new_component);
+
+  entity_component_signature[entity_id].set(component_id);
+}
 
 template <typename Tcomponent> void System::require_comopent() {
   const int component_id = Component<Tcomponent>::get_id();
