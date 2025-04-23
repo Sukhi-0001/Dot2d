@@ -1,9 +1,11 @@
 #ifndef ECS_H
 #define ECS_H
 #include <bitset>
+#include <memory>
 #include <set>
 #include <typeindex>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 const unsigned int MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
@@ -76,7 +78,7 @@ class Registry {
   std::vector<Ipool *> component_pools;
   // vector of each components signature for Entity
   // vector index == Entity.id
-  std::vector<Signature> entity_component_signature;
+  std::vector<Signature> entity_component_signatures;
   // map of active systems
   std::pmr::unordered_map<std::type_index, System *> systems;
 
@@ -84,7 +86,7 @@ class Registry {
 public:
   Registry();
   Entity create_entity();
-  void add_entity_to_system();
+  void add_entity_to_system(Entity entity);
   void kill_entity(Entity entity);
   void update();
   template <typename T, typename... Targs>
@@ -92,8 +94,16 @@ public:
 
   template <typename T> void remove_component(Entity entity);
   template <typename T> bool has_component(Entity entity) const;
-
   template <typename T> T &get_component(Entity entity) const;
+
+  template <typename Tsystem, typename... Targs>
+  void add_system(Targs &&...args);
+  template <typename Tsystem> void remove_system();
+  template <typename Tsystem> bool has_system() const;
+  template <typename Tsystem> Tsystem &get_system() const;
+  // checks the components signature of the entity and add entity to the system
+  // that are interseted in it
+  void add_entity_to_systems(Entity entity);
 };
 
 template <typename T, typename... Targs>
@@ -120,7 +130,40 @@ void Registry::add_component(Entity entity, Targs &&...args) {
 
   component_pool->set(entity_id, new_component);
 
-  entity_component_signature[entity_id].set(component_id);
+  entity_component_signatures[entity_id].set(component_id);
+}
+
+template <typename T> void Registry::remove_component(Entity entity) {
+
+  const int component_id = Component<T>::get_id();
+  const int entity_id = entity.get_id();
+
+  entity_component_signatures[entity_id].set(component_id, false);
+}
+
+template <typename T> bool Registry::has_component(Entity entity) const {
+
+  const int component_id = Component<T>::get_id();
+  const int entity_id = entity.get_id();
+  return entity_component_signatures[entity_id].test(component_id);
+}
+
+template <typename Tsystem, typename... Targs>
+void Registry::add_system(Targs &&...args) {
+  Tsystem *new_system(new Tsystem(std::forward<Targs>(args)...));
+  systems.insert(std::make_pair(std::type_index(typeid(Tsystem)), new_system));
+}
+template <typename Tsystem> void Registry::remove_system() {
+  auto system = systems.find(std::type_index(typeid(Tsystem)));
+  systems.erase(system);
+}
+template <typename Tsystem> bool Registry::has_system() const {
+  return systems.find(std::type_index(typeid(Tsystem))) != systems.end();
+}
+template <typename Tsystem> Tsystem &Registry::get_system() const {
+
+  auto system = systems.find(std::type_index(typeid(Tsystem)));
+  return std::static_pointer_cast<Tsystem>(system->second);
 }
 
 template <typename Tcomponent> void System::require_comopent() {
