@@ -30,7 +30,14 @@ class Entity {
 
 public:
   Entity(int id) : id(id) {};
+  Entity(const Entity &other) = default;
   int get_id() const;
+
+  Entity &operator=(const Entity &other) = default;
+  bool operator==(const Entity &other) const { return id == other.id; }
+  bool operator!=(const Entity &other) const { return id != other.id; }
+  bool operator>(const Entity &other) const { return id > other.id; }
+  bool operator<(const Entity &other) const { return id < other.id; }
 };
 
 class Ipool {
@@ -84,7 +91,7 @@ class Registry {
 
   // TODO
 public:
-  Registry();
+  Registry() {}
   Entity create_entity();
   void add_entity_to_system(Entity entity);
   void kill_entity(Entity entity);

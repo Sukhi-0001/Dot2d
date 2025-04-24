@@ -56,5 +56,10 @@ void Registry::add_entity_to_systems(Entity entity) {
 }
 
 void Registry::update() {
+  // add entities waiting to be added
+  for (auto entity : entities_to_be_added) {
+    add_entity_to_systems(entity);
+  }
+  entities_to_be_added.clear();
   // TODO
 }

@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -f ./build/dot2d
 mkdir -p build
 cd build
 cmake ..

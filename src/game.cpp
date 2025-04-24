@@ -1,12 +1,13 @@
 #include "SDL_events.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
+#include "ecs.h"
 #include <SDL.h>
-#include <cstddef>
 #include <game.h>
 #include <spdlog/spdlog.h>
 
 void Game::init() {
+  /*
   int error = SDL_Init(SDL_INIT_EVERYTHING);
   if (error != 0) {
     spdlog::error("Failed to create SDL window {0}", SDL_GetError());
@@ -22,11 +23,14 @@ void Game::init() {
   if (renderer == NULL) {
     spdlog::error("Failed to create SDL renderer");
   }
-
+*/
   is_running = true;
 }
 
-void Game::setup() {}
+void Game::setup() {
+  Entity car = registry->create_entity();
+  Entity truck = registry->create_entity();
+}
 
 void Game::process_input() {
   SDL_Event sdl_event;
@@ -47,11 +51,12 @@ void Game::render() {
 }
 void Game::run() {
   setup();
+  /*
   while (is_running) {
     process_input();
     update();
     render();
-  }
+  }*/
   return;
 }
 
