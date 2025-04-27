@@ -4,7 +4,10 @@
 #include "ecs.h"
 #include <SDL.h>
 #include <game.h>
+#include <glm/glm.hpp>
+#include <rigid_body_component.h>
 #include <spdlog/spdlog.h>
+#include <transform_component.h>
 
 void Game::init() {
   /*
@@ -28,8 +31,10 @@ void Game::init() {
 }
 
 void Game::setup() {
-  Entity car = registry->create_entity();
-  Entity truck = registry->create_entity();
+  Entity tank = registry->create_entity();
+  //  registry->add_component<TransformComponent>(tank, glm::vec2(10,
+  //  30),glm::vec2(1.0, 1.0), 0);
+  tank.add_component<Rigid_body_component>();
 }
 
 void Game::process_input() {

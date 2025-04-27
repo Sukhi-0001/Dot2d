@@ -2,6 +2,7 @@
 #define GAME_H
 #include <SDL.h>
 #include <ecs.h>
+#include <memory>
 
 const int FPS = 60;
 const int MILLISECONDS_PER_FPS = 1000 / FPS;
@@ -12,12 +13,12 @@ private:
   int milliseconds_previous_frame;
   SDL_Window *window;
   SDL_Renderer *renderer;
-  Registry *registry;
+  std::unique_ptr<Registry> registry;
 
 public:
   Game() {
     is_running = false;
-    registry = new Registry();
+    registry = std::make_unique<Registry>();
   }
   void init();
   void setup();

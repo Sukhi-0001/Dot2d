@@ -34,6 +34,7 @@ Entity Registry::create_entity() {
 
   Entity entity(entity_id);
   entities_to_be_added.insert(entity);
+  entity.registry = this;
   spdlog::info("Entity created with id {0:d}", entity_id);
   return entity;
 }

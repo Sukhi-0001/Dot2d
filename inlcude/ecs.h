@@ -1,5 +1,6 @@
 #ifndef ECS_H
 #define ECS_H
+#include "spdlog/spdlog.h"
 #include <bitset>
 #include <memory>
 #include <set>
@@ -17,7 +18,7 @@ protected:
 // used to assign unique id to per component type
 template <typename T> class Component : public Base_component {
   // int id;
-  //  TODO
+public:
   static int get_id() {
     static int id = next_id++;
     return id;
@@ -29,6 +30,8 @@ class Entity {
   int id;
 
 public:
+  class Registry *registry;
+
   Entity(int id) : id(id) {};
   Entity(const Entity &other) = default;
   int get_id() const;
@@ -38,6 +41,11 @@ public:
   bool operator!=(const Entity &other) const { return id != other.id; }
   bool operator>(const Entity &other) const { return id > other.id; }
   bool operator<(const Entity &other) const { return id < other.id; }
+
+  template <typename T, typename... Targs> void add_component(Targs &&...args);
+  template <typename T> void remove_component();
+  template <typename T> bool has_component() const;
+  template <typename T> T &get_component() const;
 };
 
 class Ipool {
@@ -45,7 +53,7 @@ public:
   virtual ~Ipool() {}
 };
 // POOL is just a wrapper around vector
-template <typename T> class Pool : Ipool {
+template <typename T> class Pool : public Ipool {
   std::vector<T> data;
 
 public:
@@ -98,7 +106,6 @@ public:
   void update();
   template <typename T, typename... Targs>
   void add_component(Entity entity, Targs &&...args);
-
   template <typename T> void remove_component(Entity entity);
   template <typename T> bool has_component(Entity entity) const;
   template <typename T> T &get_component(Entity entity) const;
@@ -127,7 +134,8 @@ void Registry::add_component(Entity entity, Targs &&...args) {
     component_pools[component_id] = new_component_pool;
   }
 
-  Pool<T> *component_pool = Pool<T>(component_pools[component_id]);
+  Pool<T> *component_pool =
+      static_cast<Pool<T> *>(component_pools[component_id]);
 
   if (entity_id >= component_pool->get_size()) {
     component_pool->resize(num_entities);
@@ -138,6 +146,8 @@ void Registry::add_component(Entity entity, Targs &&...args) {
   component_pool->set(entity_id, new_component);
 
   entity_component_signatures[entity_id].set(component_id);
+  spdlog::info("Added component id ${0} to entity id ${1} ", component_id,
+               entity_id);
 }
 
 template <typename T> void Registry::remove_component(Entity entity) {
@@ -146,6 +156,8 @@ template <typename T> void Registry::remove_component(Entity entity) {
   const int entity_id = entity.get_id();
 
   entity_component_signatures[entity_id].set(component_id, false);
+  spdlog::info("Removed component {0} from entity {1}", component_id,
+               entity_id);
 }
 
 template <typename T> bool Registry::has_component(Entity entity) const {
@@ -153,6 +165,13 @@ template <typename T> bool Registry::has_component(Entity entity) const {
   const int component_id = Component<T>::get_id();
   const int entity_id = entity.get_id();
   return entity_component_signatures[entity_id].test(component_id);
+}
+template <typename T> T &Registry::get_component(Entity entity) const {
+  const int component_id = Component<T>::get_id();
+  const int entity_id = entity.get_id();
+  auto component_pool =
+      std::static_pointer_cast<Pool<T>>(component_pools[component_id]);
+  return component_pool->get(entity_id);
 }
 
 template <typename Tsystem, typename... Targs>
@@ -176,5 +195,19 @@ template <typename Tsystem> Tsystem &Registry::get_system() const {
 template <typename Tcomponent> void System::require_comopent() {
   const int component_id = Component<Tcomponent>::get_id();
   components_signature.set(component_id);
+}
+
+template <typename T, typename... Targs>
+void Entity::add_component(Targs &&...args) {
+  registry->add_component<T>(*this, std::forward<Targs>(args)...);
+}
+template <typename T> void Entity::remove_component() {
+  registry->remove_component<T>(*this);
+}
+template <typename T> bool Entity::has_component() const {
+  return registry->has_component<T>(*this);
+}
+template <typename T> T &Entity::get_component() const {
+  return registry->get_component<T>(*this);
 }
 #endif // !ECS_H

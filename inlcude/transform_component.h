@@ -1,14 +1,14 @@
 #pragma once
-#include <X11/extensions/randr.h>
-#include <glm/glm.h>
+#include "ecs.h"
+#include <glm/glm.hpp>
 
-struct TransformComponent {
+struct TransformComponent : public Base_component {
   glm::vec2 position;
   glm::vec2 scale;
   double rotation;
-  TransformComponent(glm::vec2 positon, glm::vec2 scale, double rotation) {
-    this->postion = position;
+  TransformComponent(glm::vec2 position, glm::vec2 scale, double rotation) {
+    this->position = position;
     this->scale = scale;
     this->rotation = rotation;
   }
-}
+};
