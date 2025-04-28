@@ -90,12 +90,12 @@ class Registry {
   // each pool contains all data of a Component type
   // vector index == component_id
   // pool index == enitity id
-  std::vector<Ipool *> component_pools;
+  std::vector<std::shared_ptr<Ipool>> component_pools;
   // vector of each components signature for Entity
   // vector index == Entity.id
   std::vector<Signature> entity_component_signatures;
   // map of active systems
-  std::pmr::unordered_map<std::type_index, System *> systems;
+  std::pmr::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
   // TODO
 public:
@@ -130,12 +130,12 @@ void Registry::add_component(Entity entity, Targs &&...args) {
   }
 
   if (!component_pools[component_id]) {
-    Pool<T> *new_component_pool = new Pool<T>();
+    std::shared_ptr<Pool<T>> new_component_pool = std::make_shared<Pool<T>>();
     component_pools[component_id] = new_component_pool;
   }
 
-  Pool<T> *component_pool =
-      static_cast<Pool<T> *>(component_pools[component_id]);
+  std::shared_ptr<Pool<T>> component_pool =
+      std::static_pointer_cast<Pool<T>>(component_pools[component_id]);
 
   if (entity_id >= component_pool->get_size()) {
     component_pool->resize(num_entities);
@@ -176,7 +176,8 @@ template <typename T> T &Registry::get_component(Entity entity) const {
 
 template <typename Tsystem, typename... Targs>
 void Registry::add_system(Targs &&...args) {
-  Tsystem *new_system(new Tsystem(std::forward<Targs>(args)...));
+  std::shared_ptr<Tsystem> new_system =
+      std::make_shared<Tsystem>(std::forward<Targs>(args)...);
   systems.insert(std::make_pair(std::type_index(typeid(Tsystem)), new_system));
 }
 template <typename Tsystem> void Registry::remove_system() {
@@ -189,7 +190,7 @@ template <typename Tsystem> bool Registry::has_system() const {
 template <typename Tsystem> Tsystem &Registry::get_system() const {
 
   auto system = systems.find(std::type_index(typeid(Tsystem)));
-  return std::static_pointer_cast<Tsystem>(system->second);
+  return *std::static_pointer_cast<Tsystem>(system->second);
 }
 
 template <typename Tcomponent> void System::require_comopent() {
