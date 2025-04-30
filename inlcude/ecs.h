@@ -26,9 +26,8 @@ public:
 };
 
 class Entity {
-  // TODO
   int id;
-
+  // done
 public:
   class Registry *registry;
 
@@ -62,25 +61,26 @@ public:
   int get_size() const { return data.size(); }
   void resize(int size) { data.resize(size); }
   void clear() { data.clear(); }
-  void add_object(T object) { data.push_back(object); }
+  void add(T object) { data.push_back(object); }
   void set(int index, T object) { data[index] = object; }
   T &get(int index) { return static_cast<T &>(data[index]); }
   T &operator[](unsigned int index) { return data[index]; }
 };
-
+// done
 class System {
   Signature components_signature;
   std::vector<Entity> entities;
   // TODO
 public:
   System() = default;
+  ~System() = default;
   void add_entity_to_system(Entity entity);
   void remove_entity_from_system(Entity entity);
   std::vector<Entity> get_system_entities() const;
   const Signature &get_components_signature() const;
   template <typename Tcomponent> void require_comopent();
 };
-
+// done
 class Registry {
   int num_entities = 0;
   // endtities to be added at end of frame or kill
@@ -95,13 +95,12 @@ class Registry {
   // vector index == Entity.id
   std::vector<Signature> entity_component_signatures;
   // map of active systems
-  std::pmr::unordered_map<std::type_index, std::shared_ptr<System>> systems;
+  std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
   // TODO
 public:
   Registry() {}
   Entity create_entity();
-  void add_entity_to_system(Entity entity);
   void kill_entity(Entity entity);
   void update();
   template <typename T, typename... Targs>
@@ -119,7 +118,7 @@ public:
   // that are interseted in it
   void add_entity_to_systems(Entity entity);
 };
-
+// done
 template <typename T, typename... Targs>
 void Registry::add_component(Entity entity, Targs &&...args) {
   const int component_id = Component<T>::get_id();
@@ -130,7 +129,7 @@ void Registry::add_component(Entity entity, Targs &&...args) {
   }
 
   if (!component_pools[component_id]) {
-    std::shared_ptr<Pool<T>> new_component_pool = std::make_shared<Pool<T>>();
+    std::shared_ptr<Pool<T>> new_component_pool(new Pool<T>());
     component_pools[component_id] = new_component_pool;
   }
 
@@ -144,9 +143,8 @@ void Registry::add_component(Entity entity, Targs &&...args) {
   T new_component(std::forward<Targs>(args)...);
 
   component_pool->set(entity_id, new_component);
-
   entity_component_signatures[entity_id].set(component_id);
-  spdlog::info("Added component id ${0} to entity id ${1} ", component_id,
+  spdlog::info("Added component id {0} to entity id {1} ", component_id,
                entity_id);
 }
 
@@ -167,13 +165,15 @@ template <typename T> bool Registry::has_component(Entity entity) const {
   return entity_component_signatures[entity_id].test(component_id);
 }
 template <typename T> T &Registry::get_component(Entity entity) const {
+
   const int component_id = Component<T>::get_id();
   const int entity_id = entity.get_id();
   auto component_pool =
       std::static_pointer_cast<Pool<T>>(component_pools[component_id]);
+
   return component_pool->get(entity_id);
 }
-
+// done
 template <typename Tsystem, typename... Targs>
 void Registry::add_system(Targs &&...args) {
   std::shared_ptr<Tsystem> new_system =
@@ -190,7 +190,7 @@ template <typename Tsystem> bool Registry::has_system() const {
 template <typename Tsystem> Tsystem &Registry::get_system() const {
 
   auto system = systems.find(std::type_index(typeid(Tsystem)));
-  return *std::static_pointer_cast<Tsystem>(system->second);
+  return *(std::static_pointer_cast<Tsystem>(system->second));
 }
 
 template <typename Tcomponent> void System::require_comopent() {
@@ -209,6 +209,7 @@ template <typename T> bool Entity::has_component() const {
   return registry->has_component<T>(*this);
 }
 template <typename T> T &Entity::get_component() const {
+
   return registry->get_component<T>(*this);
 }
 #endif // !ECS_H

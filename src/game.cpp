@@ -2,6 +2,7 @@
 #include "SDL_render.h"
 #include "SDL_video.h"
 #include "ecs.h"
+#include "glm/fwd.hpp"
 #include <SDL.h>
 #include <game.h>
 #include <glm/glm.hpp>
@@ -37,7 +38,7 @@ void Game::setup() {
   Entity tank = registry->create_entity();
   //  registry->add_component<TransformComponent>(tank, glm::vec2(10,
   //  30),glm::vec2(1.0, 1.0), 0);
-  tank.add_component<Rigid_body_component>();
+  tank.add_component<Rigid_body_component>(glm::vec2(1, 2));
   tank.add_component<Transform_component>();
 }
 
@@ -53,8 +54,10 @@ void Game::process_input() {
   SDL_PollEvent(&sdl_event);
 }
 void Game::update() {
-  registry->get_system<Movement_system>().update(); // update the registry-
+
   registry->update();
+  registry->get_system<Movement_system>().update(); // update the registry-
+  spdlog::info("Game update ran");
 }
 void Game::render() {
   SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);

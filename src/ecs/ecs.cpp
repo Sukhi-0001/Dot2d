@@ -28,13 +28,12 @@ const Signature &System ::get_components_signature() const {
 // Registry
 Entity Registry::create_entity() {
   int entity_id = num_entities++;
+  Entity entity(entity_id);
+  entity.registry = this;
   if (entity_id >= entity_component_signatures.size()) {
     entity_component_signatures.resize(entity_id + 1);
   }
-
-  Entity entity(entity_id);
   entities_to_be_added.insert(entity);
-  entity.registry = this;
   spdlog::info("Entity created with id {0:d}", entity_id);
   return entity;
 }
@@ -58,9 +57,10 @@ void Registry::add_entity_to_systems(Entity entity) {
 
 void Registry::update() {
   // add entities waiting to be added
+  spdlog::info("registry update component pool adder {}",
+               component_pools.size());
   for (auto entity : entities_to_be_added) {
     add_entity_to_systems(entity);
   }
   entities_to_be_added.clear();
-  // TODO
 }
