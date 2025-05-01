@@ -1,5 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
+#include "assets_manager.h"
 #include <SDL.h>
 #include <ecs.h>
 #include <memory>
@@ -14,11 +15,13 @@ private:
   SDL_Window *window;
   SDL_Renderer *renderer;
   std::unique_ptr<Registry> registry;
+  std::unique_ptr<Assets_manager> assets_manager;
 
 public:
   Game() {
     is_running = false;
     registry = std::make_unique<Registry>();
+    assets_manager = std::make_unique<Assets_manager>();
   }
   void init();
   void setup();

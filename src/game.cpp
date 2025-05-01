@@ -43,7 +43,7 @@ void Game::setup() {
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(1, 1),
                                           0.0);
-  tank.add_component<Sprite_component>(10, 15);
+  tank.add_component<Sprite_component>("", 10, 15);
 }
 
 void Game::process_input() {
