@@ -40,31 +40,61 @@ void Game::setup() {
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
   Entity tank = registry->create_entity();
-  // tank.add_component<Rigid_body_component>(glm::vec2(0.01, 0.02));
+  tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(1, 1),
                                           0.0);
   tank.add_component<Sprite_component>(10, 15);
 }
 
 void Game::process_input() {
-  SDL_Event sdl_event;
-  while (SDL_PollEvent(&sdl_event)) {
-    switch (sdl_event.type) {
+  SDL_Event sdlEvent;
+  while (SDL_PollEvent(&sdlEvent)) {
+    switch (sdlEvent.type) {
     case SDL_QUIT:
       is_running = false;
       break;
+    case SDL_KEYDOWN:
+      if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
+        is_running = false;
+      }
+      break;
     }
   }
-  SDL_PollEvent(&sdl_event);
 }
 void Game::update() {
 
+  // If we are too fast, waste some time until we reach the MILLISECS_PER_FRAME
+  int timeToWait =
+      MILLISECONDS_PER_FRAME - (SDL_GetTicks() - milliseconds_previous_frame);
+  if (timeToWait > 0 && timeToWait <= MILLISECONDS_PER_FRAME) {
+    SDL_Delay(timeToWait);
+  }
+
+  // The difference in ticks since the last frame, converted to seconds
+  double deltaTime = (SDL_GetTicks() - milliseconds_previous_frame) / 1000.0;
+
+  // Store the "previous" frame time
+  milliseconds_previous_frame = SDL_GetTicks();
+  spdlog::info("delta time {0}", deltaTime);
+  // Update the registry to process the entities that are waiting to be
+  // created/deleted
   registry->update();
-  // update all the systems
-  registry->get_system<Movement_system>().update(); // update the registry-
+
+  // Invoke all the systems that need to update
+  registry->get_system<Movement_system>().update(deltaTime);
 }
 void Game::render() {
-  // SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+  /*
+  SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
+  SDL_RenderClear(renderer);
+
+  // Invoke all the systems that need to render
+  registry->get_system<Render_system>().update(renderer);
+
+  SDL_RenderPresent(renderer);
+  */
+
+  SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
   SDL_RenderClear(renderer);
   registry->get_system<Render_system>().update(renderer);
   SDL_RenderPresent(renderer);

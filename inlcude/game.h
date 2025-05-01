@@ -5,12 +5,12 @@
 #include <memory>
 
 const int FPS = 60;
-const int MILLISECONDS_PER_FPS = 1000 / FPS;
+const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
 class Game {
 private:
   bool is_running;
-  int milliseconds_previous_frame;
+  int milliseconds_previous_frame = 0;
   SDL_Window *window;
   SDL_Renderer *renderer;
   std::unique_ptr<Registry> registry;
