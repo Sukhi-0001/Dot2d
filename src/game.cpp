@@ -5,6 +5,8 @@
 #include "glm/fwd.hpp"
 #include <SDL.h>
 #include <cmath>
+#include <cstdlib>
+#include <fstream>
 #include <game.h>
 #include <glm/glm.hpp>
 #include <movement_system.h>
@@ -35,17 +37,47 @@ void Game::init() {
   is_running = true;
 }
 
-void Game::setup() {
+void Game::load_level(int level) {
+
   // add all the systems
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
+  // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img", "../assets/tank.png");
+  assets_manager->add_texture(renderer, "tilemap-img",
+                              "../assets/tilemaps/jungle.png");
+  // todo load tilemap
+  int tile_size = 32;
+  double tile_scale = 1.0;
+  int map_cols = 25;
+  int map_rows = 20;
+  std::fstream map_file;
+  map_file.open("../assets/tilemaps/jungle.map");
+  for (int y = 0; y < map_cols; y++) {
+    for (int x = 0; x < map_rows; x++) {
+      char ch;
+      map_file.get(ch);
+      int src_rect_y = std::atoi(&ch) * tile_size;
+      map_file.get(ch);
+      int src_rect_x = std::atoi(&ch) * tile_size;
+      map_file.ignore();
+      Entity tile = registry->create_entity();
+      tile.add_component<Transform_component>(
+          glm::vec2(x * (tile_scale * tile_size), y * (tile_scale * tile_size)),
+          glm::vec2(tile_scale, tile_scale), 0);
+      tile.add_component<Sprite_component>("tilemap-img", tile_size, tile_size,
+                                           src_rect_x, src_rect_y);
+    }
+  }
+  map_file.close();
   Entity tank = registry->create_entity();
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
   tank.add_component<Sprite_component>("tank-img", 300, 300);
 }
+
+void Game::setup() { load_level(1); }
 
 void Game::process_input() {
   SDL_Event sdlEvent;

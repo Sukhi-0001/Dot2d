@@ -2,7 +2,6 @@
 #include "SDL_rect.h"
 #include "SDL_render.h"
 #include "assets_manager.h"
-#include "spdlog/spdlog.h"
 #include "sprite_component.h"
 #include "transform_component.h"
 #include <ecs.h>
@@ -28,7 +27,7 @@ public:
       SDL_RenderCopyEx(renderer, assets_manager->get_texture(sprite.asset_id),
                        &src_rect, &des_rect, transform.rotation, NULL,
                        SDL_FLIP_NONE);
-      spdlog::info("Rendering image");
+      // spdlog::info("Rendering image");
     }
   }
 };

@@ -24,6 +24,7 @@ public:
     assets_manager = std::make_unique<Assets_manager>();
   }
   void init();
+  void load_level(int level);
   void setup();
   void process_input();
   void update();
