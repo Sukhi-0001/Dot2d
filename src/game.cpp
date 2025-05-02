@@ -39,11 +39,12 @@ void Game::setup() {
   // add all the systems
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
+  assets_manager->add_texture(renderer, "tank-img", "../assets/tank.png");
   Entity tank = registry->create_entity();
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
-  tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(1, 1),
+  tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
-  tank.add_component<Sprite_component>("", 10, 15);
+  tank.add_component<Sprite_component>("tank-img", 300, 300);
 }
 
 void Game::process_input() {
@@ -96,7 +97,7 @@ void Game::render() {
 
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
   SDL_RenderClear(renderer);
-  registry->get_system<Render_system>().update(renderer);
+  registry->get_system<Render_system>().update(renderer, assets_manager);
   SDL_RenderPresent(renderer);
 }
 void Game::run() {

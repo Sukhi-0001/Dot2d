@@ -1,11 +1,12 @@
-
 #pragma once
 #include "SDL_rect.h"
 #include "SDL_render.h"
+#include "assets_manager.h"
 #include "spdlog/spdlog.h"
 #include "sprite_component.h"
 #include "transform_component.h"
 #include <ecs.h>
+#include <memory>
 
 class Render_system : public System {
 public:
@@ -14,15 +15,20 @@ public:
     require_comopent<Sprite_component>();
   }
 
-  void update(SDL_Renderer *renderer) {
+  void update(SDL_Renderer *renderer,
+              std::unique_ptr<Assets_manager> &assets_manager) {
     for (auto entity : get_system_entities()) {
-      spdlog::info("I AM IN RENDER SYSTEM LOOP");
       const auto transform = entity.get_component<Transform_component>();
       const auto sprite = entity.get_component<Sprite_component>();
-      SDL_Rect obj_rect = {(int)transform.position.x, (int)transform.position.y,
-                           sprite.width, sprite.height};
-      SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-      SDL_RenderFillRect(renderer, &obj_rect);
+      // set the source rectange of the sprite
+      SDL_Rect src_rect = sprite.src_rect;
+      SDL_Rect des_rect = {(int)transform.position.x, (int)transform.position.y,
+                           (int)(sprite.width * transform.scale.x),
+                           (int)(sprite.height * transform.scale.y)};
+      SDL_RenderCopyEx(renderer, assets_manager->get_texture(sprite.asset_id),
+                       &src_rect, &des_rect, transform.rotation, NULL,
+                       SDL_FLIP_NONE);
+      spdlog::info("Rendering image");
     }
   }
 };
