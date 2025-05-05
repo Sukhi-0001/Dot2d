@@ -6,6 +6,7 @@
 #include "transform_component.h"
 #include <ecs.h>
 #include <memory>
+#include <vector>
 
 class Render_system : public System {
 public:
@@ -16,9 +17,26 @@ public:
 
   void update(SDL_Renderer *renderer,
               std::unique_ptr<Assets_manager> &assets_manager) {
+    struct Renderable_entity {
+      Transform_component transform;
+      Sprite_component sprite;
+    };
+    // sort all the entities
+    std::vector<Renderable_entity> Renderable_entities;
     for (auto entity : get_system_entities()) {
-      const auto transform = entity.get_component<Transform_component>();
-      const auto sprite = entity.get_component<Sprite_component>();
+      Renderable_entity renderable_entity;
+      renderable_entity.transform = entity.get_component<Transform_component>();
+      renderable_entity.sprite = entity.get_component<Sprite_component>();
+      Renderable_entities.push_back(renderable_entity);
+    }
+    // sort the vector with z index
+    std::sort(Renderable_entities.begin(), Renderable_entities.end(),
+              [](const Renderable_entity &a, const Renderable_entity &b) {
+                return a.sprite.z_index < b.sprite.z_index;
+              });
+    for (auto entity : Renderable_entities) {
+      const auto transform = entity.transform;
+      const auto sprite = entity.sprite;
       // set the source rectange of the sprite
       SDL_Rect src_rect = sprite.src_rect;
       SDL_Rect des_rect = {(int)transform.position.x, (int)transform.position.y,

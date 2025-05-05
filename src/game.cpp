@@ -43,10 +43,12 @@ void Game::load_level(int level) {
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
   // adding assets to manger
-  assets_manager->add_texture(renderer, "tank-img", "../assets/tank.png");
+  assets_manager->add_texture(renderer, "tank-img",
+                              "../assets/images/tank-panther-up.png");
   assets_manager->add_texture(renderer, "tilemap-img",
                               "../assets/tilemaps/jungle.png");
   // todo load tilemap
+
   int tile_size = 32;
   double tile_scale = 1.0;
   int map_cols = 25;
@@ -66,15 +68,16 @@ void Game::load_level(int level) {
           glm::vec2(x * (tile_scale * tile_size), y * (tile_scale * tile_size)),
           glm::vec2(tile_scale, tile_scale), 0);
       tile.add_component<Sprite_component>("tilemap-img", tile_size, tile_size,
-                                           src_rect_x, src_rect_y);
+                                           0, src_rect_x, src_rect_y);
     }
   }
   map_file.close();
+
   Entity tank = registry->create_entity();
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
-  tank.add_component<Sprite_component>("tank-img", 300, 300);
+  tank.add_component<Sprite_component>("tank-img", 32, 32, -1);
 }
 
 void Game::setup() { load_level(1); }
