@@ -4,6 +4,8 @@
 #include "ecs.h"
 #include "glm/fwd.hpp"
 #include <SDL.h>
+#include <animation_component.h>
+#include <animation_system.h>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -42,11 +44,14 @@ void Game::load_level(int level) {
   // add all the systems
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
+  registry->add_system<Animation_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
   assets_manager->add_texture(renderer, "tilemap-img",
                               "../assets/tilemaps/jungle.png");
+  assets_manager->add_texture(renderer, "chopper-img",
+                              "../assets/images/chopper.png");
   // todo load tilemap
 
   int tile_size = 32;
@@ -77,7 +82,12 @@ void Game::load_level(int level) {
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
-  tank.add_component<Sprite_component>("tank-img", 32, 32, -1);
+  tank.add_component<Sprite_component>("tank-img", 32, 32, 1);
+  Entity chopper = registry->create_entity();
+  chopper.add_component<Sprite_component>("chopper-img", 32, 32, 1);
+  chopper.add_component<Animation_component>(2, 24, true);
+  chopper.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
+                                             0.0);
 }
 
 void Game::setup() { load_level(1); }
@@ -118,6 +128,7 @@ void Game::update() {
 
   // Invoke all the systems that need to update
   registry->get_system<Movement_system>().update(deltaTime);
+  registry->get_system<Animation_system>().update();
 }
 void Game::render() {
   /*
