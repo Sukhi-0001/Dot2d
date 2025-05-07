@@ -14,6 +14,7 @@
 #include <game.h>
 #include <glm/glm.hpp>
 #include <movement_system.h>
+#include <render_collision_system.h>
 #include <render_system.h>
 #include <rigid_body_component.h>
 #include <spdlog/spdlog.h>
@@ -48,6 +49,7 @@ void Game::load_level(int level) {
   registry->add_system<Render_system>();
   registry->add_system<Animation_system>();
   registry->add_system<Collision_system>();
+  registry->add_system<Render_collision_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -109,6 +111,9 @@ void Game::process_input() {
       if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
         is_running = false;
       }
+      if (sdlEvent.key.keysym.sym == SDLK_d) {
+        is_debug = !is_debug;
+      }
       break;
     }
   }
@@ -151,6 +156,9 @@ void Game::render() {
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
   SDL_RenderClear(renderer);
   registry->get_system<Render_system>().update(renderer, assets_manager);
+  if (is_debug) {
+    registry->get_system<Render_collision_system>().update(renderer);
+  }
   SDL_RenderPresent(renderer);
 }
 void Game::run() {

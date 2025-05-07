@@ -11,6 +11,7 @@ const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 class Game {
 private:
   bool is_running;
+  bool is_debug;
   int milliseconds_previous_frame = 0;
   SDL_Window *window;
   SDL_Renderer *renderer;
@@ -20,6 +21,7 @@ private:
 public:
   Game() {
     is_running = false;
+    is_debug = false;
     registry = std::make_unique<Registry>();
     assets_manager = std::make_unique<Assets_manager>();
   }
