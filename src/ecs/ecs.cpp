@@ -57,8 +57,8 @@ void Registry::add_entity_to_systems(Entity entity) {
 
 void Registry::update() {
   // add entities waiting to be added
-  spdlog::info("registry update component pool adder {}",
-               component_pools.size());
+  // spdlog::info("registry update component pool adder {}",
+  //            component_pools.size());
   for (auto entity : entities_to_be_added) {
     add_entity_to_systems(entity);
   }

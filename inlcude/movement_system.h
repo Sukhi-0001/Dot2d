@@ -1,5 +1,4 @@
 #pragma once
-#include "spdlog/spdlog.h"
 #include "transform_component.h"
 #include <ecs.h>
 #include <rigid_body_component.h>
@@ -21,9 +20,9 @@ public:
 
       transform.position.y += rigid_body.velocity.y * delta_time;
 
-      spdlog::info("entity {0} moved x by {1} and y by {2}", entity.get_id(),
-                   std::to_string(transform.position.x),
-                   std::to_string(transform.position.y));
+      // spdlog::info("entity {0} moved x by {1} and y by {2}", entity.get_id(),
+      //            std::to_string(transform.position.x),
+      //         std::to_string(transform.position.y));
     }
   }
 };

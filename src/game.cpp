@@ -6,7 +6,9 @@
 #include <SDL.h>
 #include <animation_component.h>
 #include <animation_system.h>
+#include <box_collider_component.h>
 #include <cmath>
+#include <collision_system.h>
 #include <cstdlib>
 #include <fstream>
 #include <game.h>
@@ -45,6 +47,7 @@ void Game::load_level(int level) {
   registry->add_system<Movement_system>();
   registry->add_system<Render_system>();
   registry->add_system<Animation_system>();
+  registry->add_system<Collision_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -83,11 +86,14 @@ void Game::load_level(int level) {
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
   tank.add_component<Sprite_component>("tank-img", 32, 32, 1);
+  tank.add_component<Box_collider_component>(32, 32);
+
   Entity chopper = registry->create_entity();
   chopper.add_component<Sprite_component>("chopper-img", 32, 32, 1);
   chopper.add_component<Animation_component>(2, 24, true);
-  chopper.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
+  chopper.add_component<Transform_component>(glm::vec2(100, 0), glm::vec2(2, 1),
                                              0.0);
+  chopper.add_component<Box_collider_component>(32, 32);
 }
 
 void Game::setup() { load_level(1); }
@@ -121,7 +127,7 @@ void Game::update() {
 
   // Store the "previous" frame time
   milliseconds_previous_frame = SDL_GetTicks();
-  spdlog::info("delta time {0}", deltaTime);
+  // spdlog::info("delta time {0}", deltaTime);
   // Update the registry to process the entities that are waiting to be
   // created/deleted
   registry->update();
@@ -129,6 +135,7 @@ void Game::update() {
   // Invoke all the systems that need to update
   registry->get_system<Movement_system>().update(deltaTime);
   registry->get_system<Animation_system>().update();
+  registry->get_system<Collision_system>().update();
 }
 void Game::render() {
   /*
