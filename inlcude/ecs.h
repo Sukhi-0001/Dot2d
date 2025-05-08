@@ -2,6 +2,7 @@
 #define ECS_H
 #include "spdlog/spdlog.h"
 #include <bitset>
+#include <deque>
 #include <memory>
 #include <set>
 #include <typeindex>
@@ -34,6 +35,7 @@ public:
   Entity(int id) : id(id) {};
   Entity(const Entity &other) = default;
   int get_id() const;
+  void kill();
 
   Entity &operator=(const Entity &other) = default;
   bool operator==(const Entity &other) const { return id == other.id; }
@@ -96,6 +98,8 @@ class Registry {
   std::vector<Signature> entity_component_signatures;
   // map of active systems
   std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
+  // free ids are stored when entites are removed so it can be reused again
+  std::deque<int> free_ids;
 
   // TODO
 public:
@@ -117,6 +121,7 @@ public:
   // checks the components signature of the entity and add entity to the system
   // that are interseted in it
   void add_entity_to_systems(Entity entity);
+  void remove_entity_from_system(Entity entity);
 };
 // done
 template <typename T, typename... Targs>

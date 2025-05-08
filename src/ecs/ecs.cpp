@@ -27,7 +27,17 @@ const Signature &System ::get_components_signature() const {
 
 // Registry
 Entity Registry::create_entity() {
-  int entity_id = num_entities++;
+  int entity_id;
+  if (free_ids.empty()) {
+    entity_id = num_entities++;
+    if (entity_id >= entity_component_signatures.size()) {
+      entity_component_signatures.resize(entity_id + 1);
+    }
+  } else {
+    // resuse id from free_ids stack
+    entity_id = free_ids.front();
+    free_ids.pop_front();
+  }
   Entity entity(entity_id);
   entity.registry = this;
   if (entity_id >= entity_component_signatures.size()) {
@@ -36,6 +46,11 @@ Entity Registry::create_entity() {
   entities_to_be_added.insert(entity);
   spdlog::info("Entity created with id {0:d}", entity_id);
   return entity;
+}
+void Entity::kill() { registry->kill_entity(*this); }
+
+void Registry::kill_entity(Entity entity) {
+  entities_to_be_killed.insert(entity);
 }
 
 void Registry::add_entity_to_systems(Entity entity) {
@@ -55,6 +70,12 @@ void Registry::add_entity_to_systems(Entity entity) {
   }
 }
 
+void Registry::remove_entity_from_system(Entity entity) {
+  for (auto system : systems) {
+    system.second->remove_entity_from_system(entity);
+  }
+}
+
 void Registry::update() {
   // add entities waiting to be added
   // spdlog::info("registry update component pool adder {}",
@@ -63,4 +84,13 @@ void Registry::update() {
     add_entity_to_systems(entity);
   }
   entities_to_be_added.clear();
+  // remove all the entities that are needed to be removed
+  for (auto entity : entities_to_be_killed) {
+    remove_entity_from_system(entity);
+    // clear the component bitset also
+    entity_component_signatures[entity.get_id()].reset();
+    // make the entity to be reuse
+    free_ids.push_back(entity.get_id());
+  }
+  entities_to_be_killed.clear();
 }

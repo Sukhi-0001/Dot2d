@@ -96,6 +96,7 @@ void Game::load_level(int level) {
   chopper.add_component<Transform_component>(glm::vec2(100, 0), glm::vec2(2, 1),
                                              0.0);
   chopper.add_component<Box_collider_component>(32, 32);
+  chopper.kill();
 }
 
 void Game::setup() { load_level(1); }
