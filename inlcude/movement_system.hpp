@@ -1,7 +1,7 @@
 #pragma once
-#include "transform_component.h"
-#include <ecs.h>
-#include <rigid_body_component.h>
+#include "transform_component.hpp"
+#include <ecs.hpp>
+#include <rigid_body_component.hpp>
 
 class Movement_system : public System {
 public:

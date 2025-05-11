@@ -1,25 +1,25 @@
 #include "SDL_events.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
-#include "ecs.h"
+#include "ecs.hpp"
 #include "glm/fwd.hpp"
 #include <SDL.h>
-#include <animation_component.h>
-#include <animation_system.h>
-#include <box_collider_component.h>
+#include <animation_component.hpp>
+#include <animation_system.hpp>
+#include <box_collider_component.hpp>
 #include <cmath>
-#include <collision_system.h>
+#include <collision_system.hpp>
 #include <cstdlib>
 #include <fstream>
-#include <game.h>
+#include <game.hpp>
 #include <glm/glm.hpp>
-#include <movement_system.h>
-#include <render_collision_system.h>
-#include <render_system.h>
-#include <rigid_body_component.h>
+#include <movement_system.hpp>
+#include <render_collision_system.hpp>
+#include <render_system.hpp>
+#include <rigid_body_component.hpp>
 #include <spdlog/spdlog.h>
-#include <sprite_component.h>
-#include <transform_component.h>
+#include <sprite_component.hpp>
+#include <transform_component.hpp>
 
 void Game::init() {
 

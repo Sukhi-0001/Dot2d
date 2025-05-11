@@ -1,8 +1,8 @@
 #pragma once
-#include "box_collider_component.h"
-#include "ecs.h"
+#include "box_collider_component.hpp"
+#include "ecs.hpp"
 #include "spdlog/spdlog.h"
-#include "transform_component.h"
+#include "transform_component.hpp"
 
 class Collision_system : public System {
 public:

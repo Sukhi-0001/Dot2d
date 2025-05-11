@@ -1,10 +1,10 @@
 #pragma once
 #include "SDL_rect.h"
 #include "SDL_render.h"
-#include "assets_manager.h"
-#include "sprite_component.h"
-#include "transform_component.h"
-#include <ecs.h>
+#include "assets_manager.hpp"
+#include "sprite_component.hpp"
+#include "transform_component.hpp"
+#include <ecs.hpp>
 #include <memory>
 #include <vector>
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "ecs.h"
+#include "ecs.hpp"
 #include "glm/fwd.hpp"
 #include <glm/glm.hpp>
 

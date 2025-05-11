@@ -2,9 +2,9 @@
 
 #include "SDL_rect.h"
 #include "SDL_render.h"
-#include "box_collider_component.h"
-#include "ecs.h"
-#include "transform_component.h"
+#include "box_collider_component.hpp"
+#include "ecs.hpp"
+#include "transform_component.hpp"
 class Render_collision_system : public System {
 public:
   Render_collision_system() {

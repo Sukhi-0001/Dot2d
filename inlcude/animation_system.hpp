@@ -1,8 +1,8 @@
 #pragma once
 #include "SDL_timer.h"
-#include "animation_component.h"
-#include "ecs.h"
-#include "sprite_component.h"
+#include "animation_component.hpp"
+#include "ecs.hpp"
+#include "sprite_component.hpp"
 
 class Animation_system : public System {
 

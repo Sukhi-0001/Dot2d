@@ -1,5 +1,5 @@
 #pragma once
-#include "ecs.h"
+#include "ecs.hpp"
 #include <glm/glm.hpp>
 
 struct Box_collider_component : public Base_component {

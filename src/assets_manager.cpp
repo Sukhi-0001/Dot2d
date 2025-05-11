@@ -2,7 +2,7 @@
 #include "SDL_render.h"
 #include "SDL_surface.h"
 #include "spdlog/spdlog.h"
-#include <assets_manager.h>
+#include <assets_manager.hpp>
 
 Assets_manager::Assets_manager() { spdlog::info("creating assets_manager"); }
 

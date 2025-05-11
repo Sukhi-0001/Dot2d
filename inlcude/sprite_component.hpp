@@ -1,6 +1,6 @@
 #pragma once
 #include "SDL_rect.h"
-#include "ecs.h"
+#include "ecs.hpp"
 #include <glm/glm.hpp>
 #include <string>
 

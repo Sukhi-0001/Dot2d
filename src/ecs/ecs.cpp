@@ -1,6 +1,6 @@
 #include "spdlog/spdlog.h"
 #include <algorithm>
-#include <ecs.h>
+#include <ecs.hpp>
 #include <vector>
 int Base_component::next_id = 0;
 

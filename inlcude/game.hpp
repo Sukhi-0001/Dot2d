@@ -1,8 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
-#include "assets_manager.h"
+#include "assets_manager.hpp"
 #include <SDL.h>
-#include <ecs.h>
+#include <ecs.hpp>
+#include <events/event_bus.hpp>
 #include <memory>
 
 const int FPS = 60;
@@ -17,6 +18,7 @@ private:
   SDL_Renderer *renderer;
   std::unique_ptr<Registry> registry;
   std::unique_ptr<Assets_manager> assets_manager;
+  std::unique_ptr<Event_bus> event_bus;
 
 public:
   Game() {

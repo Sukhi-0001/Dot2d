@@ -1,4 +1,4 @@
-#include <game.h>
+#include <game.hpp>
 #include <glm/vec3.hpp>
 using namespace std;
 

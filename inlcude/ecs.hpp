@@ -1,10 +1,10 @@
 #ifndef ECS_H
 #define ECS_H
-#include "spdlog/spdlog.h"
 #include <bitset>
 #include <deque>
 #include <memory>
 #include <set>
+#include <spdlog/spdlog.h>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
