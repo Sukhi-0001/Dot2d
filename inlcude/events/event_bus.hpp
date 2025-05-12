@@ -19,7 +19,7 @@ public:
 template <typename TOwner, typename TEvent>
 class Event_callback : public Ievent_callback {
   typedef void (TOwner::*Callback_function)(TEvent &);
-  TOwner owner_instance;
+  TOwner *owner_instance;
   Callback_function callback_function;
   virtual void call(Event &e) {
     std::invoke(callback_function, owner_instance, static_cast<TEvent &>(e));
@@ -41,11 +41,11 @@ class Event_bus {
 public:
   Event_bus() = default;
   ~Event_bus() = default;
-  template <typename TOwner, typename TEvent>
+  template <typename TEvent, typename TOwner>
   void subscribe_to_event(TOwner *owner_instance,
                           void (TOwner::*callback_function)(TEvent &)) {
-    if (!subscribers[typeid(typeid(TEvent))].get()) {
-      subscribers[typeid(typeid(TEvent))] = std::make_unique<Hander_list>();
+    if (!subscribers[typeid(TEvent)].get()) {
+      subscribers[typeid(TEvent)] = std::make_unique<Hander_list>();
     }
     auto subscriber = std::make_unique<Event_callback<TOwner, TEvent>>(
         owner_instance, callback_function);
@@ -53,7 +53,7 @@ public:
   }
   template <typename TEvent, typename... TArgs>
   void emit_event(TArgs &&...args) {
-    auto handers = subscribers[typeid(typeid(TEvent))].get();
+    auto handers = subscribers[typeid(TEvent)].get();
     if (handers) {
       for (auto it = handers->begin(); it != handers->end(); it++) {
         auto hander = it->get();
@@ -62,6 +62,8 @@ public:
       }
     }
   }
+
+  void reset() { subscribers.clear(); }
 
 private:
 };

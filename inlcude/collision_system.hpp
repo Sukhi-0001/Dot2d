@@ -1,8 +1,11 @@
 #pragma once
 #include "box_collider_component.hpp"
 #include "ecs.hpp"
+#include "events/collision_event.hpp"
+#include "events/event_bus.hpp"
 #include "spdlog/spdlog.h"
 #include "transform_component.hpp"
+#include <memory>
 
 class Collision_system : public System {
 public:
@@ -11,7 +14,7 @@ public:
     require_comopent<Transform_component>();
   }
   ~Collision_system() {}
-  void update() {
+  void update(std::unique_ptr<Event_bus> &event_bus) {
     auto entity = get_system_entities();
     for (auto i = entity.begin(); i != entity.end(); i++) {
       Entity a = *i;
@@ -31,6 +34,7 @@ public:
             b_transform.position.y + b_collider.offset.y, b_collider.width,
             b_collider.height);
         if (is_collision_happen) {
+          event_bus->emit_event<Collision_event>(a, b);
           spdlog::info("collision detected of entity {0} and entity {1}",
                        a.get_id(), b.get_id());
         }

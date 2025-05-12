@@ -1,6 +1,7 @@
 #include "SDL_events.h"
 #include "SDL_render.h"
 #include "SDL_video.h"
+#include "damage_system.hpp"
 #include "ecs.hpp"
 #include "glm/fwd.hpp"
 #include <SDL.h>
@@ -10,6 +11,7 @@
 #include <cmath>
 #include <collision_system.hpp>
 #include <cstdlib>
+#include <events/event_bus.hpp>
 #include <fstream>
 #include <game.hpp>
 #include <glm/glm.hpp>
@@ -50,6 +52,7 @@ void Game::load_level(int level) {
   registry->add_system<Animation_system>();
   registry->add_system<Collision_system>();
   registry->add_system<Render_collision_system>();
+  registry->add_system<Damage_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -96,7 +99,6 @@ void Game::load_level(int level) {
   chopper.add_component<Transform_component>(glm::vec2(100, 0), glm::vec2(2, 1),
                                              0.0);
   chopper.add_component<Box_collider_component>(32, 32);
-  chopper.kill();
 }
 
 void Game::setup() { load_level(1); }
@@ -134,6 +136,10 @@ void Game::update() {
   // Store the "previous" frame time
   milliseconds_previous_frame = SDL_GetTicks();
   // spdlog::info("delta time {0}", deltaTime);
+  // reset all the event handerls
+  event_bus->reset();
+  // subsribe to all the events
+  registry->get_system<Damage_system>().subscribe_to_events(event_bus);
   // Update the registry to process the entities that are waiting to be
   // created/deleted
   registry->update();
@@ -141,7 +147,8 @@ void Game::update() {
   // Invoke all the systems that need to update
   registry->get_system<Movement_system>().update(deltaTime);
   registry->get_system<Animation_system>().update();
-  registry->get_system<Collision_system>().update();
+  registry->get_system<Collision_system>().update(event_bus);
+  registry->get_system<Damage_system>().update();
 }
 void Game::render() {
   /*

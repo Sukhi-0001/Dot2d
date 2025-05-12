@@ -26,6 +26,7 @@ public:
     is_debug = false;
     registry = std::make_unique<Registry>();
     assets_manager = std::make_unique<Assets_manager>();
+    event_bus = std::make_unique<Event_bus>();
   }
   void init();
   void load_level(int level);
