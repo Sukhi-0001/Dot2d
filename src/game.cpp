@@ -1,9 +1,4 @@
-#include "SDL_events.h"
-#include "SDL_render.h"
 #include "SDL_video.h"
-#include "damage_system.hpp"
-#include "ecs.hpp"
-#include "glm/fwd.hpp"
 #include <SDL.h>
 #include <animation_component.hpp>
 #include <animation_system.hpp>
@@ -11,10 +6,13 @@
 #include <cmath>
 #include <collision_system.hpp>
 #include <cstdlib>
+#include <damage_system.hpp>
+#include <ecs.hpp>
 #include <events/event_bus.hpp>
 #include <fstream>
 #include <game.hpp>
 #include <glm/glm.hpp>
+#include <keyboard_control_system.hpp>
 #include <movement_system.hpp>
 #include <render_collision_system.hpp>
 #include <render_system.hpp>
@@ -53,6 +51,7 @@ void Game::load_level(int level) {
   registry->add_system<Collision_system>();
   registry->add_system<Render_collision_system>();
   registry->add_system<Damage_system>();
+  registry->add_system<Keyboard_control_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -117,6 +116,7 @@ void Game::process_input() {
       if (sdlEvent.key.keysym.sym == SDLK_d) {
         is_debug = !is_debug;
       }
+      event_bus->emit_event<Key_press_event>(sdlEvent.key.keysym.sym);
       break;
     }
   }
@@ -140,6 +140,8 @@ void Game::update() {
   event_bus->reset();
   // subsribe to all the events
   registry->get_system<Damage_system>().subscribe_to_events(event_bus);
+  registry->get_system<Keyboard_control_system>().subscribe_to_events(
+      event_bus);
   // Update the registry to process the entities that are waiting to be
   // created/deleted
   registry->update();
@@ -149,6 +151,7 @@ void Game::update() {
   registry->get_system<Animation_system>().update();
   registry->get_system<Collision_system>().update(event_bus);
   registry->get_system<Damage_system>().update();
+  registry->get_system<Keyboard_control_system>().update();
 }
 void Game::render() {
   /*

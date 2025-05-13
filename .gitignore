@@ -2,6 +2,7 @@ build/
 .cache/
 compile_commands.json
 libs/*
+CMakeFiles/
 
 # But do not ignore this one file
 !libs/CMakeLists.txt
