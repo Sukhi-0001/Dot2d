@@ -5,7 +5,6 @@
 #include "events/key_press_event.hpp"
 #include "keyboard_control_component.hpp"
 #include "rigid_body_component.hpp"
-#include "spdlog/spdlog.h"
 #include "sprite_component.hpp"
 
 class Keyboard_control_system : public System {

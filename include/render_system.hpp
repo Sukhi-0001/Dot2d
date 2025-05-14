@@ -16,7 +16,8 @@ public:
   }
 
   void update(SDL_Renderer *renderer,
-              std::unique_ptr<Assets_manager> &assets_manager) {
+              std::unique_ptr<Assets_manager> &assets_manager,
+              SDL_Rect camera) {
     struct Renderable_entity {
       Transform_component transform;
       Sprite_component sprite;
@@ -39,7 +40,8 @@ public:
       const auto sprite = entity.sprite;
       // set the source rectange of the sprite
       SDL_Rect src_rect = sprite.src_rect;
-      SDL_Rect des_rect = {(int)transform.position.x, (int)transform.position.y,
+      SDL_Rect des_rect = {(int)transform.position.x - camera.x,
+                           (int)transform.position.y - camera.y,
                            (int)(sprite.width * transform.scale.x),
                            (int)(sprite.height * transform.scale.y)};
       SDL_RenderCopyEx(renderer, assets_manager->get_texture(sprite.asset_id),

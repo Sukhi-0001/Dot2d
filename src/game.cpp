@@ -1,9 +1,11 @@
 #include "SDL_video.h"
 #include "glm/fwd.hpp"
+#include <Camera_movement_system.hpp>
 #include <SDL.h>
 #include <animation_component.hpp>
 #include <animation_system.hpp>
 #include <box_collider_component.hpp>
+#include <camera_follow_component.hpp>
 #include <cmath>
 #include <collision_system.hpp>
 #include <cstdlib>
@@ -22,7 +24,10 @@
 #include <spdlog/spdlog.h>
 #include <sprite_component.hpp>
 #include <transform_component.hpp>
-
+int Game::map_height;
+int Game::map_width;
+int Game::window_height;
+int Game::window_width;
 void Game::init() {
 
   int error = SDL_Init(SDL_INIT_EVERYTHING);
@@ -42,6 +47,10 @@ void Game::init() {
   }
 
   is_running = true;
+  camera.x = 0;
+  camera.y = 0;
+  camera.w = 800;
+  camera.h = 600;
 }
 
 void Game::load_level(int level) {
@@ -54,6 +63,7 @@ void Game::load_level(int level) {
   registry->add_system<Render_collision_system>();
   registry->add_system<Damage_system>();
   registry->add_system<Keyboard_control_system>();
+  registry->add_system<Camera_movement_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -64,7 +74,7 @@ void Game::load_level(int level) {
   // todo load tilemap
 
   int tile_size = 32;
-  double tile_scale = 1.0;
+  double tile_scale = 2.0;
   int map_cols = 25;
   int map_rows = 20;
   std::fstream map_file;
@@ -86,7 +96,8 @@ void Game::load_level(int level) {
     }
   }
   map_file.close();
-
+  map_width = map_cols * tile_size * tile_scale;
+  map_height = map_cols * tile_size * tile_scale;
   Entity tank = registry->create_entity();
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
@@ -103,6 +114,7 @@ void Game::load_level(int level) {
   chopper.add_component<Rigid_body_component>(glm::vec2(20, 0));
   chopper.add_component<Keyboard_control_component>(
       glm::vec2(0, -20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
+  chopper.add_component<Camera_follow_component>();
 }
 
 void Game::setup() { load_level(1); }
@@ -157,6 +169,7 @@ void Game::update() {
   registry->get_system<Collision_system>().update(event_bus);
   registry->get_system<Damage_system>().update();
   registry->get_system<Keyboard_control_system>().update();
+  registry->get_system<Camera_movement_system>().update(camera);
 }
 void Game::render() {
   /*
@@ -171,7 +184,8 @@ void Game::render() {
 
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
   SDL_RenderClear(renderer);
-  registry->get_system<Render_system>().update(renderer, assets_manager);
+  registry->get_system<Render_system>().update(renderer, assets_manager,
+                                               camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer);
   }
