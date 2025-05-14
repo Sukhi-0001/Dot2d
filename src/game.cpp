@@ -1,4 +1,5 @@
 #include "SDL_video.h"
+#include "glm/fwd.hpp"
 #include <SDL.h>
 #include <animation_component.hpp>
 #include <animation_system.hpp>
@@ -12,6 +13,7 @@
 #include <fstream>
 #include <game.hpp>
 #include <glm/glm.hpp>
+#include <keyboard_control_component.hpp>
 #include <keyboard_control_system.hpp>
 #include <movement_system.hpp>
 #include <render_collision_system.hpp>
@@ -58,7 +60,7 @@ void Game::load_level(int level) {
   assets_manager->add_texture(renderer, "tilemap-img",
                               "../assets/tilemaps/jungle.png");
   assets_manager->add_texture(renderer, "chopper-img",
-                              "../assets/images/chopper.png");
+                              "../assets/images/chopper-spritesheet.png");
   // todo load tilemap
 
   int tile_size = 32;
@@ -98,6 +100,9 @@ void Game::load_level(int level) {
   chopper.add_component<Transform_component>(glm::vec2(100, 0), glm::vec2(2, 1),
                                              0.0);
   chopper.add_component<Box_collider_component>(32, 32);
+  chopper.add_component<Rigid_body_component>(glm::vec2(20, 0));
+  chopper.add_component<Keyboard_control_component>(
+      glm::vec2(0, -20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
 }
 
 void Game::setup() { load_level(1); }
