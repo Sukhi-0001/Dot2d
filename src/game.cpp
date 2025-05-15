@@ -92,7 +92,7 @@ void Game::load_level(int level) {
           glm::vec2(x * (tile_scale * tile_size), y * (tile_scale * tile_size)),
           glm::vec2(tile_scale, tile_scale), 0);
       tile.add_component<Sprite_component>("tilemap-img", tile_size, tile_size,
-                                           0, src_rect_x, src_rect_y);
+                                           0, false, src_rect_x, src_rect_y);
     }
   }
   map_file.close();
@@ -187,7 +187,7 @@ void Game::render() {
   registry->get_system<Render_system>().update(renderer, assets_manager,
                                                camera);
   if (is_debug) {
-    registry->get_system<Render_collision_system>().update(renderer);
+    registry->get_system<Render_collision_system>().update(renderer, camera);
   }
   SDL_RenderPresent(renderer);
 }
