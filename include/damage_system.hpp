@@ -14,8 +14,8 @@ public:
   }
   void on_collision(Collision_event &event) {
     spdlog::info("damage system recived collison event");
-    event.a.kill();
-    event.b.kill();
+    // event.a.kill();
+    // event.b.kill();
   }
 
   void update() {}

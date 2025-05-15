@@ -18,6 +18,8 @@
 #include <keyboard_control_component.hpp>
 #include <keyboard_control_system.hpp>
 #include <movement_system.hpp>
+#include <projectile_emit_system.hpp>
+#include <projectile_emitter_component.hpp>
 #include <render_collision_system.hpp>
 #include <render_system.hpp>
 #include <rigid_body_component.hpp>
@@ -64,6 +66,7 @@ void Game::load_level(int level) {
   registry->add_system<Damage_system>();
   registry->add_system<Keyboard_control_system>();
   registry->add_system<Camera_movement_system>();
+  registry->add_system<Projectile_emit_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -71,6 +74,8 @@ void Game::load_level(int level) {
                               "../assets/tilemaps/jungle.png");
   assets_manager->add_texture(renderer, "chopper-img",
                               "../assets/images/chopper-spritesheet.png");
+  assets_manager->add_texture(renderer, "bullet-img",
+                              "../assets/images/bullet.png");
   // todo load tilemap
 
   int tile_size = 32;
@@ -115,6 +120,8 @@ void Game::load_level(int level) {
   chopper.add_component<Keyboard_control_component>(
       glm::vec2(0, -20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
   chopper.add_component<Camera_follow_component>();
+  chopper.add_component<Projectile_emitter_component>(glm::vec2(80, 0), 5000,
+                                                      10000, 0, false);
 }
 
 void Game::setup() { load_level(1); }
@@ -170,6 +177,7 @@ void Game::update() {
   registry->get_system<Damage_system>().update();
   registry->get_system<Keyboard_control_system>().update();
   registry->get_system<Camera_movement_system>().update(camera);
+  registry->get_system<Projectile_emit_system>().update(registry);
 }
 void Game::render() {
   /*
