@@ -9,6 +9,8 @@
 #include "sprite_component.hpp"
 #include "transform_component.hpp"
 #include <memory>
+#include <projectile_component.hpp>
+
 class Projectile_emit_system : public System {
 public:
   Projectile_emit_system() {
@@ -38,6 +40,10 @@ public:
         projectile.add_component<Sprite_component>("bullet-img", 4, 4, 10);
         projectile.add_component<Box_collider_component>(4, 4);
         projectile_emitter.last_emission_time = SDL_GetTicks();
+        projectile.add_component<Projectile_comoponent>(
+            projectile_emitter.is_friendly,
+            projectile_emitter.hit_percent_damage,
+            projectile_emitter.projectile_duration);
       }
     }
   }

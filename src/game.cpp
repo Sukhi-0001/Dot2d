@@ -1,6 +1,8 @@
 #include "SDL_video.h"
 #include "glm/fwd.hpp"
+#include "health_component.hpp"
 #include <Camera_movement_system.hpp>
+#include <Projectile_life_cycle_system.hpp>
 #include <SDL.h>
 #include <animation_component.hpp>
 #include <animation_system.hpp>
@@ -67,6 +69,7 @@ void Game::load_level(int level) {
   registry->add_system<Keyboard_control_system>();
   registry->add_system<Camera_movement_system>();
   registry->add_system<Projectile_emit_system>();
+  registry->add_system<Projectile_life_cycle_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -120,8 +123,9 @@ void Game::load_level(int level) {
   chopper.add_component<Keyboard_control_component>(
       glm::vec2(0, -20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
   chopper.add_component<Camera_follow_component>();
-  chopper.add_component<Projectile_emitter_component>(glm::vec2(80, 0), 5000,
-                                                      10000, 0, false);
+  chopper.add_component<Projectile_emitter_component>(glm::vec2(150, 150), 0,
+                                                      10000, 0, true);
+  chopper.add_component<Health_component>(100);
 }
 
 void Game::setup() { load_level(1); }
@@ -178,6 +182,7 @@ void Game::update() {
   registry->get_system<Keyboard_control_system>().update();
   registry->get_system<Camera_movement_system>().update(camera);
   registry->get_system<Projectile_emit_system>().update(registry);
+  registry->get_system<Projectile_life_cycle_system>().update();
 }
 void Game::render() {
   /*
