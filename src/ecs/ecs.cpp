@@ -49,6 +49,18 @@ Entity Registry::create_entity() {
 }
 void Entity::kill() { registry->kill_entity(*this); }
 
+void Entity::tag(const std::string &tag) { registry->tag_entity(*this, tag); }
+bool Entity::has_tag(const std::string &tag) {
+  return registry->entity_has_tag(*this, tag);
+}
+
+void Entity::group(const std::string &group_name) {
+  registry->group_entity(*this, group_name);
+}
+bool Entity::belong_to_group(const std::string &group_name) {
+  return registry->entity_belongs_to_group(*this, group_name);
+}
+
 void Registry::kill_entity(Entity entity) {
   entities_to_be_killed.insert(entity);
 }
@@ -91,6 +103,60 @@ void Registry::update() {
     entity_component_signatures[entity.get_id()].reset();
     // make the entity to be reuse
     free_ids.push_back(entity.get_id());
+    // remove tags and group
+    remove_entity_tag(entity);
+    remove_entity_group(entity);
   }
   entities_to_be_killed.clear();
+}
+
+// tag mangement
+void Registry::tag_entity(Entity entity, const std::string &tag) {
+  entity_per_tag.emplace(tag, entity);
+  tag_per_entity.emplace(entity.get_id(), tag);
+}
+bool Registry::entity_has_tag(Entity entity, const std::string &tag) {
+  if (tag_per_entity.find(entity.get_id()) == tag_per_entity.end()) {
+    return false;
+  }
+  return entity_per_tag.find(tag)->second == entity;
+}
+Entity Registry::get_entity_by_tag(const std::string &tag) {
+  return entity_per_tag.at(tag);
+}
+void Registry::remove_entity_tag(Entity entity) {
+  auto tagged_entity = tag_per_entity.find(entity.get_id());
+  if (tagged_entity != tag_per_entity.end()) {
+    auto tag = tagged_entity->second;
+    entity_per_tag.erase(tag);
+    tag_per_entity.erase(tagged_entity);
+  }
+}
+// group management
+void Registry::group_entity(Entity entity, const std::string &group) {
+  entities_per_group.emplace(group, std::set<Entity>());
+  entities_per_group[group].emplace(entity);
+  group_per_entity.emplace(entity.get_id(), group);
+}
+bool Registry::entity_belongs_to_group(Entity entity,
+                                       const std::string &group) {
+  auto group_entities = entities_per_group.at(group);
+  return group_entities.find(entity.get_id()) != group_entities.end();
+}
+std::vector<Entity> Registry::get_entities_by_group(const std::string &group) {
+  auto &set_of_entities = entities_per_group.at(group);
+  return std::vector<Entity>(set_of_entities.begin(), set_of_entities.end());
+}
+void Registry::remove_entity_group(Entity entity) {
+  auto grouped_entity = group_per_entity.find(entity.get_id());
+  if (grouped_entity != group_per_entity.end()) {
+    auto group = entities_per_group.find(grouped_entity->second);
+    if (group != entities_per_group.end()) {
+      auto entity_in_group = group->second.find(entity);
+      if (entity_in_group != group->second.end()) {
+        group->second.erase(entity_in_group);
+      }
+    }
+    group_per_entity.erase(grouped_entity);
+  }
 }

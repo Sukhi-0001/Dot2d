@@ -96,6 +96,7 @@ void Game::load_level(int level) {
       int src_rect_x = std::atoi(&ch) * tile_size;
       map_file.ignore();
       Entity tile = registry->create_entity();
+      tile.group("group");
       tile.add_component<Transform_component>(
           glm::vec2(x * (tile_scale * tile_size), y * (tile_scale * tile_size)),
           glm::vec2(tile_scale, tile_scale), 0);
@@ -107,6 +108,7 @@ void Game::load_level(int level) {
   map_width = map_cols * tile_size * tile_scale;
   map_height = map_cols * tile_size * tile_scale;
   Entity tank = registry->create_entity();
+  tank.group("enemies");
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
@@ -114,6 +116,7 @@ void Game::load_level(int level) {
   tank.add_component<Box_collider_component>(32, 32);
 
   Entity chopper = registry->create_entity();
+  chopper.tag("player");
   chopper.add_component<Sprite_component>("chopper-img", 32, 32, 1);
   chopper.add_component<Animation_component>(2, 24, true);
   chopper.add_component<Transform_component>(glm::vec2(100, 0), glm::vec2(2, 1),

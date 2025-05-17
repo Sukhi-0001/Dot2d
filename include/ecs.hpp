@@ -5,6 +5,7 @@
 #include <memory>
 #include <set>
 #include <spdlog/spdlog.h>
+#include <string>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -47,6 +48,11 @@ public:
   template <typename T> void remove_component();
   template <typename T> bool has_component() const;
   template <typename T> T &get_component() const;
+  void tag(const std::string &tag);
+  bool has_tag(const std::string &tag);
+
+  void group(const std::string &group_name);
+  bool belong_to_group(const std::string &group_name);
 };
 
 class Ipool {
@@ -85,6 +91,12 @@ public:
 // done
 class Registry {
   int num_entities = 0;
+  // one tag per entity
+  std::unordered_map<int, std::string> tag_per_entity;
+  std::unordered_map<std::string, Entity> entity_per_tag;
+  // enities per group set of entites per group
+  std::unordered_map<std::string, std::set<Entity>> entities_per_group;
+  std::unordered_map<int, std::string> group_per_entity;
   // endtities to be added at end of frame or kill
   std::set<Entity> entities_to_be_added;
   std::set<Entity> entities_to_be_killed;
@@ -122,6 +134,16 @@ public:
   // that are interseted in it
   void add_entity_to_systems(Entity entity);
   void remove_entity_from_system(Entity entity);
+  // tag management
+  void tag_entity(Entity entity, const std::string &tag);
+  bool entity_has_tag(Entity entity, const std::string &tag);
+  Entity get_entity_by_tag(const std::string &tag);
+  void remove_entity_tag(Entity entity);
+  // group management
+  void group_entity(Entity entity, const std::string &group);
+  bool entity_belongs_to_group(Entity entity, const std::string &group);
+  std::vector<Entity> get_entities_by_group(const std::string &group);
+  void remove_entity_group(Entity entity);
 };
 // done
 template <typename T, typename... Targs>
