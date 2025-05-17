@@ -170,6 +170,7 @@ void Game::update() {
   registry->get_system<Damage_system>().subscribe_to_events(event_bus);
   registry->get_system<Keyboard_control_system>().subscribe_to_events(
       event_bus);
+  registry->get_system<Projectile_emit_system>().subscribe_to_events(event_bus);
   // Update the registry to process the entities that are waiting to be
   // created/deleted
   registry->update();
