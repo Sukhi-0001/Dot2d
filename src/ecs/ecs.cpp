@@ -137,10 +137,17 @@ void Registry::group_entity(Entity entity, const std::string &group) {
   entities_per_group.emplace(group, std::set<Entity>());
   entities_per_group[group].emplace(entity);
   group_per_entity.emplace(entity.get_id(), group);
+  spdlog::info("added group {0}", group);
 }
 bool Registry::entity_belongs_to_group(Entity entity,
                                        const std::string &group) {
-  auto group_entities = entities_per_group.at(group);
+
+  auto it = entities_per_group.find(group);
+  if (it == entities_per_group.end()) {
+    spdlog::warn("this group not found {0}", group);
+    return false; // or handle error
+  }
+  auto &group_entities = it->second;
   return group_entities.find(entity.get_id()) != group_entities.end();
 }
 std::vector<Entity> Registry::get_entities_by_group(const std::string &group) {

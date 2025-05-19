@@ -108,12 +108,15 @@ void Game::load_level(int level) {
   map_width = map_cols * tile_size * tile_scale;
   map_height = map_cols * tile_size * tile_scale;
   Entity tank = registry->create_entity();
-  tank.group("enemies");
+  tank.group("enimies");
   tank.add_component<Rigid_body_component>(glm::vec2(10, 0));
   tank.add_component<Transform_component>(glm::vec2(10, 10), glm::vec2(2, 1),
                                           0.0);
   tank.add_component<Sprite_component>("tank-img", 32, 32, 1);
   tank.add_component<Box_collider_component>(32, 32);
+  tank.add_component<Health_component>(50);
+  tank.add_component<Projectile_emitter_component>(glm::vec2(150, 150), 1000,
+                                                   1000, 10, false);
 
   Entity chopper = registry->create_entity();
   chopper.tag("player");
@@ -127,7 +130,7 @@ void Game::load_level(int level) {
       glm::vec2(0, -20), glm::vec2(20, 0), glm::vec2(0, 20), glm::vec2(-20, 0));
   chopper.add_component<Camera_follow_component>();
   chopper.add_component<Projectile_emitter_component>(glm::vec2(150, 150), 0,
-                                                      10000, 0, true);
+                                                      10000, 10, true);
   chopper.add_component<Health_component>(100);
 }
 

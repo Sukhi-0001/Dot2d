@@ -5,11 +5,11 @@
 
 class Projectile_life_cycle_system : public System {
 public:
-  Projectile_life_cycle_system() { require_comopent<Projectile_comoponent>(); }
+  Projectile_life_cycle_system() { require_comopent<Projectile_component>(); }
 
   void update() {
     for (auto entity : get_system_entities()) {
-      auto projectile = entity.get_component<Projectile_comoponent>();
+      auto projectile = entity.get_component<Projectile_component>();
       // kill projectile after the limit
       if (SDL_GetTicks() - projectile.start_time > projectile.duration) {
         entity.kill();

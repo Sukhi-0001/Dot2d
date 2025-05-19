@@ -56,13 +56,14 @@ public:
           projectile_velocity.y = projectile_emitter.velocity.y * direction_y;
           // add new projectile
           Entity projectile = entity.registry->create_entity();
+          projectile.group("projectiles");
           projectile.add_component<Transform_component>(projectile_pos,
                                                         glm::vec2(1, 1), 0);
           projectile.add_component<Rigid_body_component>(projectile_velocity);
           projectile.add_component<Sprite_component>("bullet-img", 4, 4, 10);
           projectile.add_component<Box_collider_component>(4, 4);
           projectile_emitter.last_emission_time = SDL_GetTicks();
-          projectile.add_component<Projectile_comoponent>(
+          projectile.add_component<Projectile_component>(
               projectile_emitter.is_friendly,
               projectile_emitter.hit_percent_damage,
               projectile_emitter.projectile_duration);
@@ -90,6 +91,7 @@ public:
         }
         // add new projectile
         Entity projectile = registry->create_entity();
+        projectile.group("projectiles");
         projectile.add_component<Transform_component>(projectile_pos,
                                                       glm::vec2(1, 1), 0);
         projectile.add_component<Rigid_body_component>(
@@ -97,7 +99,7 @@ public:
         projectile.add_component<Sprite_component>("bullet-img", 4, 4, 10);
         projectile.add_component<Box_collider_component>(4, 4);
         projectile_emitter.last_emission_time = SDL_GetTicks();
-        projectile.add_component<Projectile_comoponent>(
+        projectile.add_component<Projectile_component>(
             projectile_emitter.is_friendly,
             projectile_emitter.hit_percent_damage,
             projectile_emitter.projectile_duration);
