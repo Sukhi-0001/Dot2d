@@ -101,6 +101,11 @@ void Registry::update() {
     remove_entity_from_system(entity);
     // clear the component bitset also
     entity_component_signatures[entity.get_id()].reset();
+    // remove entity from the component pools
+    for (auto pool : component_pools) {
+      if (pool)
+        pool->remove_entity_from_pool(entity.get_id());
+    }
     // make the entity to be reuse
     free_ids.push_back(entity.get_id());
     // remove tags and group
