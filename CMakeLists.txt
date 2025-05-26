@@ -69,6 +69,8 @@ target_include_directories(${NAME}
 # Link required libraries
 target_link_libraries(${NAME} PRIVATE SDL2::SDL2)
 target_link_libraries(${NAME} PRIVATE SDL2_image::SDL2_image)
+target_link_libraries(${NAME} PRIVATE SDL2::SDL2 SDL2_ttf)
 target_link_libraries(${NAME} PRIVATE glm::glm)
 target_link_libraries(${NAME} PRIVATE spdlog::spdlog)
+
 

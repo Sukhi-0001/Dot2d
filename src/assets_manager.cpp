@@ -1,6 +1,7 @@
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_surface.h"
+#include "SDL_ttf.h"
 #include "spdlog/spdlog.h"
 #include <assets_manager.hpp>
 
@@ -16,6 +17,11 @@ void Assets_manager::clear_assets() {
     SDL_DestroyTexture(texture.second);
   }
   textures.clear();
+  // todo clear fonts
+  for (auto font : fonts) {
+    TTF_CloseFont(font.second);
+  }
+  fonts.clear();
 }
 void Assets_manager::add_texture(SDL_Renderer *renderer,
                                  const std::string &asset_id,
@@ -29,4 +35,12 @@ void Assets_manager::add_texture(SDL_Renderer *renderer,
 }
 SDL_Texture *Assets_manager::get_texture(const std::string &asset_id) {
   return textures[asset_id];
+}
+
+void Assets_manager::add_font(const std::string &asset_id,
+                              const std::string &file_path, int font_size) {
+  fonts.emplace(asset_id, TTF_OpenFont(file_path.c_str(), font_size));
+}
+TTF_Font *Assets_manager::get_font(const std::string &asset_id) {
+  return fonts[asset_id];
 }

@@ -15,3 +15,7 @@
 	path = libs/SDL_image
 	url = https://github.com/libsdl-org/SDL_image.git
 	branch = release-2.8.x
+[submodule "libs/SDL_ttf"]
+	path = libs/SDL_ttf
+	url = https://github.com/libsdl-org/SDL_ttf.git
+	branch = SDL2
