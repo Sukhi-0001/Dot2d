@@ -1,3 +1,5 @@
+#include "SDL_pixels.h"
+#include "SDL_ttf.h"
 #include "SDL_video.h"
 #include "glm/fwd.hpp"
 #include "health_component.hpp"
@@ -24,9 +26,11 @@
 #include <projectile_emitter_component.hpp>
 #include <render_collision_system.hpp>
 #include <render_system.hpp>
+#include <render_text_system.hpp>
 #include <rigid_body_component.hpp>
 #include <spdlog/spdlog.h>
 #include <sprite_component.hpp>
+#include <text_label_component.hpp>
 #include <transform_component.hpp>
 int Game::map_height;
 int Game::map_width;
@@ -37,6 +41,9 @@ void Game::init() {
   int error = SDL_Init(SDL_INIT_EVERYTHING);
   if (error != 0) {
     spdlog::error("Failed to create SDL window {0}", SDL_GetError());
+  }
+  if (TTF_Init() != 0) {
+    spdlog::error("TTF not init");
   }
   window =
       SDL_CreateWindow("Dot2D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -70,6 +77,7 @@ void Game::load_level(int level) {
   registry->add_system<Camera_movement_system>();
   registry->add_system<Projectile_emit_system>();
   registry->add_system<Projectile_life_cycle_system>();
+  registry->add_system<Render_text_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -79,6 +87,7 @@ void Game::load_level(int level) {
                               "../assets/images/chopper-spritesheet.png");
   assets_manager->add_texture(renderer, "bullet-img",
                               "../assets/images/bullet.png");
+  assets_manager->add_font("charriot-font", "../assets/fonts/charriot.ttf", 14);
   // todo load tilemap
 
   int tile_size = 32;
@@ -132,6 +141,12 @@ void Game::load_level(int level) {
   chopper.add_component<Projectile_emitter_component>(glm::vec2(150, 150), 0,
                                                       10000, 10, true);
   chopper.add_component<Health_component>(100);
+
+  Entity label = registry->create_entity();
+  SDL_Color text_color = {255, 0, 0};
+  label.add_component<Text_label_component>(
+      glm::vec2(window_width / 2 - 40, 10), "CHOPPER 0.1", "charriot-font",
+      text_color, true);
 }
 
 void Game::setup() { load_level(1); }
@@ -206,6 +221,8 @@ void Game::render() {
   SDL_RenderClear(renderer);
   registry->get_system<Render_system>().update(renderer, assets_manager,
                                                camera);
+  registry->get_system<Render_text_system>().update(renderer, assets_manager,
+                                                    camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer, camera);
   }
