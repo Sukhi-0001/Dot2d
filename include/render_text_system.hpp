@@ -29,6 +29,7 @@ public:
           (int)(text_label.postion.y - (text_label.is_fixed ? 0 : camera.y)),
           width, height};
       SDL_RenderCopy(renderer, texture, NULL, &des_rect);
+      SDL_DestroyTexture(texture);
     }
   }
 };

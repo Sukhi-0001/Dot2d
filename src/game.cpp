@@ -25,6 +25,7 @@
 #include <projectile_emit_system.hpp>
 #include <projectile_emitter_component.hpp>
 #include <render_collision_system.hpp>
+#include <render_health_bar_system.hpp>
 #include <render_system.hpp>
 #include <render_text_system.hpp>
 #include <rigid_body_component.hpp>
@@ -78,6 +79,7 @@ void Game::load_level(int level) {
   registry->add_system<Projectile_emit_system>();
   registry->add_system<Projectile_life_cycle_system>();
   registry->add_system<Render_text_system>();
+  registry->add_system<Render_health_bar_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -88,6 +90,7 @@ void Game::load_level(int level) {
   assets_manager->add_texture(renderer, "bullet-img",
                               "../assets/images/bullet.png");
   assets_manager->add_font("charriot-font", "../assets/fonts/charriot.ttf", 14);
+  assets_manager->add_font("pico8-font-5", "../assets/fonts/arial.ttf", 5);
   // todo load tilemap
 
   int tile_size = 32;
@@ -223,6 +226,8 @@ void Game::render() {
                                                camera);
   registry->get_system<Render_text_system>().update(renderer, assets_manager,
                                                     camera);
+  registry->get_system<Render_health_bar_system>().update(
+      renderer, assets_manager, camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer, camera);
   }
