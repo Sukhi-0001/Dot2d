@@ -19,6 +19,9 @@
 #include <fstream>
 #include <game.hpp>
 #include <glm/glm.hpp>
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdlrenderer2.h>
 #include <keyboard_control_component.hpp>
 #include <keyboard_control_system.hpp>
 #include <movement_system.hpp>
@@ -57,6 +60,8 @@ void Game::init() {
   if (renderer == NULL) {
     spdlog::error("Failed to create SDL renderer");
   }
+  // setup imgui
+  ImGui::CreateContext();
 
   is_running = true;
   camera.x = 0;
