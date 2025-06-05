@@ -60,8 +60,17 @@ void Game::init() {
   if (renderer == NULL) {
     spdlog::error("Failed to create SDL renderer");
   }
-  // setup imgui
+  // setup imgu
+  IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+  ImGui_ImplSDLRenderer2_Init(renderer);
+  ImGuiIO &io = ImGui::GetIO();
+  (void)io;
+  io.ConfigFlags |=
+      ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+  io.ConfigFlags |=
+      ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls;
 
   is_running = true;
   camera.x = 0;
@@ -162,6 +171,8 @@ void Game::setup() { load_level(1); }
 void Game::process_input() {
   SDL_Event sdlEvent;
   while (SDL_PollEvent(&sdlEvent)) {
+    // imgui SDL events
+    ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
     switch (sdlEvent.type) {
     case SDL_QUIT:
       is_running = false;
@@ -215,15 +226,6 @@ void Game::update() {
   registry->get_system<Projectile_life_cycle_system>().update();
 }
 void Game::render() {
-  /*
-  SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
-  SDL_RenderClear(renderer);
-
-  // Invoke all the systems that need to render
-  registry->get_system<Render_system>().update(renderer);
-
-  SDL_RenderPresent(renderer);
-  */
 
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
   SDL_RenderClear(renderer);
@@ -235,6 +237,12 @@ void Game::render() {
       renderer, assets_manager, camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer, camera);
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
+    ImGui::Render();
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
   }
   SDL_RenderPresent(renderer);
 }
@@ -250,6 +258,10 @@ void Game::run() {
 }
 
 void Game::destroy() {
+  // Cleanup
+  ImGui_ImplSDLRenderer2_Shutdown();
+  ImGui_ImplSDL2_Shutdown();
+  ImGui::DestroyContext();
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 }
