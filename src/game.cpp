@@ -28,6 +28,7 @@
 #include <projectile_emit_system.hpp>
 #include <projectile_emitter_component.hpp>
 #include <render_collision_system.hpp>
+#include <render_gui_system.hpp>
 #include <render_health_bar_system.hpp>
 #include <render_system.hpp>
 #include <render_text_system.hpp>
@@ -94,6 +95,7 @@ void Game::load_level(int level) {
   registry->add_system<Projectile_life_cycle_system>();
   registry->add_system<Render_text_system>();
   registry->add_system<Render_health_bar_system>();
+  registry->add_system<Render_gui_system>();
   // adding assets to manger
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
@@ -237,12 +239,7 @@ void Game::render() {
       renderer, assets_manager, camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer, camera);
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-    ImGui::ShowDemoWindow();
-    ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+    registry->get_system<Render_gui_system>().update(renderer);
   }
   SDL_RenderPresent(renderer);
 }
