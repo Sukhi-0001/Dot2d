@@ -239,7 +239,7 @@ void Game::render() {
       renderer, assets_manager, camera);
   if (is_debug) {
     registry->get_system<Render_collision_system>().update(renderer, camera);
-    registry->get_system<Render_gui_system>().update(renderer);
+    registry->get_system<Render_gui_system>().update(renderer, registry);
   }
   SDL_RenderPresent(renderer);
 }
