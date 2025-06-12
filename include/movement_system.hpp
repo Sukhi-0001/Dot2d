@@ -23,6 +23,12 @@ public:
       // spdlog::info("entity {0} moved x by {1} and y by {2}", entity.get_id(),
       //            std::to_string(transform.position.x),
       //         std::to_string(transform.position.y));
+      bool is_entity_outside_map =
+          (transform.position.x < 0 || transform.position.x > Game::map_width ||
+           transform.position.y < 0 || transform.position.y > Game::map_height);
+      if (is_entity_outside_map && !entity.has_tag("player")) {
+        entity.kill();
+      }
     }
   }
 };
