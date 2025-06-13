@@ -3,6 +3,7 @@ add_subdirectory(./glm)
 add_subdirectory(./spdlog)
 add_subdirectory(./SDL_image)
 add_subdirectory(./SDL_ttf)
+add_subdirectory(./sol2)
 # make imgui with sdl 2
 
 cmake_minimum_required(VERSION 3.10)
@@ -27,4 +28,5 @@ target_include_directories(imgui PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends
     ${CMAKE_CURRENT_SOURCE_DIR}/SDL/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/sol2/include
 )

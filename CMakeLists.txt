@@ -1,31 +1,3 @@
-#[[set(PROJECT_FILES
-  "./src/game.cpp"
-  "./src/ecs/ecs.cpp"
-  "./src/main.cpp"
-  "./src/assets_manager.cpp"
-)
-cmake_minimum_required(VERSION 3.5.0)
-set(NAME "dot2d")
-project(${NAME})
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED On)
-#including libs
-add_subdirectory(./libs)
-add_executable(${NAME} ${PROJECT_FILES})
-#including folders
-#include_directories(include/)
-#target_include_directories(${NAME} PRIVATE ./include/)
-target_include_directories(${NAME}
-  PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(${NAME} PRIVATE SDL2::SDL2)
-target_link_libraries(${NAME} PRIVATE SDL2_image::SDL2_image)
-target_link_libraries(${NAME} PRIVATE glm::glm)
-target_link_libraries(${NAME} PRIVATE spdlog::spdlog)
-]]
-
 
 # Minimum required CMake version
 cmake_minimum_required(VERSION 3.5.0)
@@ -57,7 +29,7 @@ set(PROJECT_FILES
 
 # Add external libraries (assuming SDL2 is built within ./libs)
 add_subdirectory(./libs)
-
+find_package(Lua 5.3 REQUIRED)
 # Create executable from project files
 add_executable(${NAME} ${PROJECT_FILES})
 
@@ -65,6 +37,7 @@ add_executable(${NAME} ${PROJECT_FILES})
 target_include_directories(${NAME}
   PRIVATE ${CMAKE_SOURCE_DIR}/include
 )
+target_include_directories(${NAME} PRIVATE /usr/include/lua5.3)
 
 # Link required libraries
 target_link_libraries(${NAME} PRIVATE SDL2::SDL2)
@@ -73,5 +46,6 @@ target_link_libraries(${NAME} PRIVATE SDL2::SDL2 SDL2_ttf)
 target_link_libraries(${NAME} PRIVATE glm::glm)
 target_link_libraries(${NAME} PRIVATE spdlog::spdlog)
 target_link_libraries(${NAME} PRIVATE imgui)
+target_link_libraries(${NAME} PRIVATE ${LUA_LIBRARIES} sol2::sol2)
 
 
