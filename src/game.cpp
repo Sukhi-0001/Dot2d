@@ -33,6 +33,8 @@
 #include <render_system.hpp>
 #include <render_text_system.hpp>
 #include <rigid_body_component.hpp>
+#include <sol/sol.hpp>
+#include <sol/types.hpp>
 #include <spdlog/spdlog.h>
 #include <sprite_component.hpp>
 #include <text_label_component.hpp>
@@ -41,8 +43,21 @@ int Game::map_height;
 int Game::map_width;
 int Game::window_height;
 int Game::window_width;
+void test_lua() {
+  sol::state lua;
+  lua.open_libraries(sol::lib::base);
+  lua.script_file("../assets/scripts/launchpad.lua");
+  bool is_fullscreen = lua["config"]["fullscreen"];
+  sol::table config = lua["config"];
+  int width = config["resolution"]["width"];
+  int height = config["resolution"]["height"];
+  spdlog::info("here {0} {1}", width, height);
+  // exit(0);
+}
+
 void Game::init() {
 
+  test_lua();
   int error = SDL_Init(SDL_INIT_EVERYTHING);
   if (error != 0) {
     spdlog::error("Failed to create SDL window {0}", SDL_GetError());
