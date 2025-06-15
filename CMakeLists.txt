@@ -25,6 +25,7 @@ set(PROJECT_FILES
     "./src/ecs/ecs.cpp"
     "./src/main.cpp"
     "./src/assets_manager.cpp"
+    "./src/level_loader.cpp"
 )
 
 # Add external libraries (assuming SDL2 is built within ./libs)
