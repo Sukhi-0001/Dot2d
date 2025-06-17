@@ -108,7 +108,8 @@ void Game::setup() {
   registry->add_system<Render_health_bar_system>();
   registry->add_system<Render_gui_system>();
   Level_loader loader;
-  loader.load_level(registry, assets_manager, renderer, 1);
+  lua.open_libraries(sol::lib::base);
+  loader.load_level(lua, registry, assets_manager, renderer, 1);
 }
 
 void Game::process_input() {

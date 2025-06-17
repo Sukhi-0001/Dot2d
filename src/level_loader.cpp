@@ -37,10 +37,16 @@
 #include <render_system.hpp>
 #include <render_text_system.hpp>
 #include <rigid_body_component.hpp>
+#include <sol/error.hpp>
+#include <sol/load_result.hpp>
+#include <sol/optional_implementation.hpp>
 #include <sol/sol.hpp>
+#include <sol/state.hpp>
+#include <sol/table.hpp>
 #include <sol/types.hpp>
 #include <spdlog/spdlog.h>
 #include <sprite_component.hpp>
+#include <string>
 #include <text_label_component.hpp>
 #include <transform_component.hpp>
 
@@ -49,10 +55,45 @@ Level_loader::Level_loader() {}
 Level_loader::~Level_loader() {}
 
 void Level_loader::load_level(
-    const std::unique_ptr<Registry> &registry,
+    sol::state &lua, const std::unique_ptr<Registry> &registry,
     const std::unique_ptr<Assets_manager> &assets_manager,
-    SDL_Renderer *renderer, int level) {
+    SDL_Renderer *renderer, int level_no) {
+  sol::load_result script = lua.load_file("../assets/scripts/Level" +
+                                          std::to_string(level_no) + ".lua");
+  if (!script.valid()) {
+    sol::error err = script;
+    std::string err_msg = err.what();
+    spdlog::warn("{0}", err_msg);
+    return;
+  }
+  lua.script_file("../assets/scripts/Level" + std::to_string(level_no) +
+                  ".lua");
+  sol::table level = lua["Level"];
+  // read the level assets
+  sol::table assets = level["assets"];
+  int i = 0;
+  while (true) {
+    sol::optional<sol::table> has_asset = assets[i];
+    if (has_asset == sol::nullopt) {
+      break;
+    }
+    sol::table asset = assets[i];
+    std::string asset_type = asset["type"];
+    if (asset_type == "texture") {
+      assets_manager->add_texture(renderer, asset["id"], asset["file"]);
+      std::string asset_id = asset["id"];
+      spdlog::info("A new texture added into assets manager id {0}", asset_id);
+    }
+    if (asset_type == "font") {
+      assets_manager->add_font(asset["id"], asset["file"], asset["font_size"]);
+      std::string asset_id = asset["id"];
+      spdlog::info("A new font added into assets manager id {0}", asset_id);
+    }
+    i++;
+  }
+
   // adding assets to manger
+  /*
   assets_manager->add_texture(renderer, "tank-img",
                               "../assets/images/tank-panther-up.png");
   assets_manager->add_texture(renderer, "tilemap-img",
@@ -122,4 +163,5 @@ void Level_loader::load_level(
   label.add_component<Text_label_component>(
       glm::vec2(Game::window_width / 2 - 40, 10), "CHOPPER 0.1",
       "charriot-font", text_color, true);
+  */
 }
