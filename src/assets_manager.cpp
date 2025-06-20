@@ -31,15 +31,19 @@ void Assets_manager::add_texture(SDL_Renderer *renderer,
   SDL_FreeSurface(surface);
   // add texture to map
   textures.emplace(asset_id, texture);
-  spdlog::info("new asset added asset id {0}", asset_id);
+  spdlog::info("new asset texture added asset id {0}", asset_id);
 }
 SDL_Texture *Assets_manager::get_texture(const std::string &asset_id) {
+  if (textures.find(asset_id) == textures.end()) {
+    spdlog::warn("Trying to accces asset that does not exits {0}", asset_id);
+  }
   return textures[asset_id];
 }
 
 void Assets_manager::add_font(const std::string &asset_id,
                               const std::string &file_path, int font_size) {
   fonts.emplace(asset_id, TTF_OpenFont(file_path.c_str(), font_size));
+  spdlog::info("new asset font added asset id {0}", asset_id);
 }
 TTF_Font *Assets_manager::get_font(const std::string &asset_id) {
   return fonts[asset_id];
